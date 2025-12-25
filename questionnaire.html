@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire d'Acceptabilité du Prix - PSM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2C5F8D 0%, #4A7BA7 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .product-input {
+            margin-bottom: 30px;
+        }
+        
+        .product-input label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2C5F8D;
+        }
+        
+        .product-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .product-input input:focus {
+            outline: none;
+            border-color: #2C5F8D;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .section h2 {
+            color: #2C5F8D;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2C5F8D;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+        }
+        
+        .question-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .question-hint {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .price-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .price-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .price-input input:focus {
+            outline: none;
+            border-color: #2C5F8D;
+        }
+        
+        .price-input span {
+            font-weight: bold;
+            color: #2C5F8D;
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .radio-option:hover, .checkbox-option:hover {
+            background: #e8f4f8;
+        }
+        
+        .radio-option input, .checkbox-option input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2C5F8D 0%, #4A7BA7 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(44, 95, 141, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .thank-you {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .thank-you h2 {
+            color: #2C5F8D;
+            margin-bottom: 15px;
+        }
+        
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        
+        .admin-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #2C5F8D;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 999;
+        }
+        
+        .admin-btn:hover {
+            background: #4A7BA7;
+        }
+        
+        .results-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #2C5F8D;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .results-link:hover {
+            background: #4A7BA7;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Questionnaire d'Acceptabilité du Prix</h1>
+            <p>Méthode PSM (Price Sensitivity Meter)</p>
+        </div>
+        
+        <div class="content" id="formContent">
+            <form id="psmForm">
+                <div class="product-input">
+                    <label for="product">Produit/Service évalué :</label>
+                    <input type="text" id="product" name="product" required 
+                           placeholder="Ex: Abonnement streaming, Formation en ligne, etc.">
+                </div>
+                
+                <div class="section">
+                    <h2>Section 1 : Perception du Prix</h2>
+                    
+                    <div class="question">
+                        <div class="question-label">1. À quel prix ce produit/service commence à être BON MARCHÉ ?</div>
+                        <div class="question-hint">(Un prix avantageux, mais sans mettre en doute la qualité)</div>
+                        <div class="price-input">
+                            <input type="number" name="cheap" step="0.01" min="0" required>
+                            <span>€</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <div class="question-label">2. À quel prix ce produit/service est TROP BON MARCHÉ ?</div>
+                        <div class="question-hint">(Un prix si bas que vous douteriez de la qualité)</div>
+                        <div class="price-input">
+                            <input type="number" name="tooCheap" step="0.01" min="0" required>
+                            <span>€</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <div class="question-label">3. À quel prix ce produit/service commence à être CHER ?</div>
+                        <div class="question-hint">(Un prix élevé, mais que vous pourriez encore envisager)</div>
+                        <div class="price-input">
+                            <input type="number" name="expensive" step="0.01" min="0" required>
+                            <span>€</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <div class="question-label">4. À quel prix ce produit/service est TROP CHER ?</div>
+                        <div class="question-hint">(Un prix que vous ne seriez absolument pas prêt(e) à payer)</div>
+                        <div class="price-input">
+                            <input type="number" name="tooExpensive" step="0.01" min="0" required>
+                            <span>€</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Section 2 : Intention d'Achat</h2>
+                    
+                    <div class="question">
+                        <div class="question-label">5. Prix MAXIMUM que vous seriez prêt(e) à payer :</div>
+                        <div class="price-input">
+                            <input type="number" name="maxPrice" step="0.01" min="0" required>
+                            <span>€</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <div class="question-label">6. Prix IDÉAL (meilleur rapport qualité-prix) :</div>
+                        <div class="price-input">
+                            <input type="number" name="idealPrice" step="0.01" min="0" required>
+                            <span>€</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Section 3 : Contexte d'Achat</h2>
+                    
+                    <div class="question">
+                        <div class="question-label">7. Fréquence d'achat envisagée :</div>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="frequency" value="unique" required>
+                                Achat unique
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="frequency" value="occasional">
+                                Occasionnel (quelques fois par an)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="frequency" value="regular">
+                                Régulier (mensuel)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="frequency" value="frequent">
+                                Fréquent (hebdomadaire ou plus)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <div class="question-label">8. Importance du prix dans votre décision :</div>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="priceImportance" value="veryHigh" required>
+                                Très importante
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="priceImportance" value="high">
+                                Importante
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="priceImportance" value="medium">
+                                Moyennement importante
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="priceImportance" value="low">
+                                Peu importante
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="priceImportance" value="veryLow">
+                                Pas importante du tout
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Section 4 : Profil</h2>
+                    
+                    <div class="question">
+                        <div class="question-label">9. Tranche d'âge :</div>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="age" value="18-25" required>
+                                18-25 ans
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="age" value="26-35">
+                                26-35 ans
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="age" value="36-45">
+                                36-45 ans
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="age" value="46-55">
+                                46-55 ans
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="age" value="56+">
+                                56 ans et plus
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <div class="question-label">10. Revenu mensuel net du ménage (optionnel) :</div>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="income" value="<1500">
+                                Moins de 1 500 €
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="income" value="1500-2500">
+                                1 500 - 2 500 €
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="income" value="2500-3500">
+                                2 500 - 3 500 €
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="income" value="3500-5000">
+                                3 500 - 5 000 €
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="income" value=">5000">
+                                Plus de 5 000 €
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="income" value="noAnswer">
+                                Préfère ne pas répondre
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Soumettre mes réponses</button>
+            </form>
+        </div>
+        
+        <div class="content" id="thankYou" style="display: none;">
+            <div class="thank-you">
+                <h2>✓ Merci pour votre participation !</h2>
+                <p>Vos réponses ont été enregistrées avec succès.</p>
+                <p style="margin-top: 20px; color: #666;">
+                    Elles permettront de déterminer la fourchette de prix optimale pour ce produit/service.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <button class="admin-btn" onclick="window.location.href='results.html'">📊</button>
+    
+    <script>
+        document.getElementById('psmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                timestamp: new Date().toISOString(),
+                product: formData.get('product'),
+                tooCheap: parseFloat(formData.get('tooCheap')),
+                cheap: parseFloat(formData.get('cheap')),
+                expensive: parseFloat(formData.get('expensive')),
+                tooExpensive: parseFloat(formData.get('tooExpensive')),
+                maxPrice: parseFloat(formData.get('maxPrice')),
+                idealPrice: parseFloat(formData.get('idealPrice')),
+                frequency: formData.get('frequency'),
+                priceImportance: formData.get('priceImportance'),
+                age: formData.get('age'),
+                income: formData.get('income') || 'noAnswer'
+            };
+            
+            // Sauvegarder dans localStorage
+            let responses = JSON.parse(localStorage.getItem('psmResponses') || '[]');
+            responses.push(data);
+            localStorage.setItem('psmResponses', JSON.stringify(responses));
+            
+            // Afficher le message de remerciement
+            document.getElementById('formContent').style.display = 'none';
+            document.getElementById('thankYou').style.display = 'block';
+            
+            // Réinitialiser après 3 secondes
+            setTimeout(() => {
+                document.getElementById('formContent').style.display = 'block';
+                document.getElementById('thankYou').style.display = 'none';
+                e.target.reset();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
